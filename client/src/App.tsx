@@ -1,41 +1,47 @@
+import { useEffect } from "react";
 import { Switch, Route } from "wouter";
+import { queryClient } from "./lib/queryClient";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider } from "./hooks/use-auth";
+import { CartProvider } from "./hooks/use-cart";
 import { Toaster } from "@/components/ui/toaster";
-import { ProtectedRoute } from "./lib/protected-route";
 import NotFound from "@/pages/not-found";
-import HomePage from "@/pages/home-page";
 import AuthPage from "@/pages/auth-page";
-import ProductDetailsPage from "@/pages/product-details-page";
-import CartPage from "@/pages/cart-page";
+import HomePage from "@/pages/home-page";
+import AdminPage from "@/pages/admin-page";
 import CheckoutPage from "@/pages/checkout-page";
-import ProfilePage from "@/pages/profile-page";
-import AdminDashboardPage from "@/pages/admin/dashboard-page";
-import AdminProductsPage from "@/pages/admin/products-page";
-import AdminOrdersPage from "@/pages/admin/orders-page";
-import Layout from "@/components/layout/Layout";
+import { ProtectedRoute } from "./lib/protected-route";
+import { AdminRoute } from "./lib/protected-route";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={HomePage} />
       <Route path="/auth" component={AuthPage} />
-      <Route path="/products/:id" component={ProductDetailsPage} />
-      <ProtectedRoute path="/cart" component={CartPage} />
       <ProtectedRoute path="/checkout" component={CheckoutPage} />
-      <ProtectedRoute path="/profile" component={ProfilePage} />
-      <ProtectedRoute path="/admin" component={AdminDashboardPage} />
-      <ProtectedRoute path="/admin/products" component={AdminProductsPage} />
-      <ProtectedRoute path="/admin/orders" component={AdminOrdersPage} />
+      <AdminRoute path="/admin" component={AdminPage} />
       <Route component={NotFound} />
     </Switch>
   );
 }
 
 function App() {
+  // Preload common data
+  useEffect(() => {
+    queryClient.prefetchQuery({
+      queryKey: ["/api/products"],
+    });
+  }, []);
+
   return (
-    <Layout>
-      <Router />
-      <Toaster />
-    </Layout>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <CartProvider>
+          <Router />
+          <Toaster />
+        </CartProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 
