@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { getInrFromUsd, formatUsd } from "@/lib/currency";
 import { 
   Card,
   CardContent,
@@ -263,15 +264,36 @@ export function CheckoutForm() {
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2 border p-4 rounded-lg">
-                      <RadioGroupItem value="paypal" id="paypal" disabled={createOrderMutation.isPending} />
-                      <Label htmlFor="paypal" className="flex items-center space-x-2 cursor-pointer">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-                          <path d="M7 11l5-7"></path>
-                          <path d="M21 11l-5-7"></path>
-                          <path d="M12 4h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-4"></path>
-                          <path d="M11 20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h4"></path>
+                      <RadioGroupItem value="phonepe" id="phonepe" disabled={createOrderMutation.isPending} />
+                      <Label htmlFor="phonepe" className="flex items-center space-x-2 cursor-pointer">
+                        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M20.5 12C20.5 16.6944 16.6944 20.5 12 20.5C7.30558 20.5 3.5 16.6944 3.5 12C3.5 7.30558 7.30558 3.5 12 3.5C16.6944 3.5 20.5 7.30558 20.5 12Z" stroke="currentColor"/>
+                          <path d="M14.8332 9.77392C14.7279 9.76551 14.622 9.76136 14.516 9.76136C13.3466 9.76136 12.367 10.5239 11.8082 11.6681C11.4094 11.014 10.8224 10.5282 10.0745 10.4043C9.58309 10.3216 8.9395 10.3747 8.39226 10.6851V15.3341H10.0745V12.3568C10.0745 11.9205 10.4324 11.5625 10.8686 11.5625C11.305 11.5625 11.6631 11.9205 11.6631 12.3568V15.3341H13.3447V12.3568C13.3447 11.9205 13.7034 11.5625 14.1396 11.5625C14.5757 11.5625 14.9332 11.9205 14.9332 12.3568V15.3341H16.6155V11.8747C16.6155 10.8736 15.8337 9.83239 14.8332 9.77392Z" fill="currentColor"/>
+                          <path d="M7.59517 9.59375C8.03139 9.59375 8.38517 9.23997 8.38517 8.80375C8.38517 8.36753 8.03139 8.01375 7.59517 8.01375C7.15895 8.01375 6.80517 8.36753 6.80517 8.80375C6.80517 9.23997 7.15895 9.59375 7.59517 9.59375Z" fill="currentColor"/>
+                          <path d="M8.38462 15.3337V10.4037H6.80469V15.3337H8.38462Z" fill="currentColor"/>
                         </svg>
-                        <span>PayPal</span>
+                        <span>PhonePe</span>
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 border p-4 rounded-lg">
+                      <RadioGroupItem value="googlepay" id="googlepay" disabled={createOrderMutation.isPending} />
+                      <Label htmlFor="googlepay" className="flex items-center space-x-2 cursor-pointer">
+                        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor"/>
+                          <path d="M15.5 8.5H14.5L12 14.5L9.5 8.5H8.5L11.5 15.5H12.5L15.5 8.5Z" fill="currentColor"/>
+                        </svg>
+                        <span>Google Pay</span>
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 border p-4 rounded-lg">
+                      <RadioGroupItem value="paytm" id="paytm" disabled={createOrderMutation.isPending} />
+                      <Label htmlFor="paytm" className="flex items-center space-x-2 cursor-pointer">
+                        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M18.75 3H5.25C3.59315 3 2.25 4.34315 2.25 6V18C2.25 19.6569 3.59315 21 5.25 21H18.75C20.4069 21 21.75 19.6569 21.75 18V6C21.75 4.34315 20.4069 3 18.75 3Z" stroke="currentColor"/>
+                          <path d="M7 9.5V14.5H9V12H10.5V14.5H12.5V9.5H10.5V11H9V9.5H7Z" fill="currentColor"/>
+                          <path d="M15 9.5H13V14.5H15C16.3807 14.5 17.5 13.3807 17.5 12C17.5 10.6193 16.3807 9.5 15 9.5Z" fill="currentColor"/>
+                        </svg>
+                        <span>Paytm</span>
                       </Label>
                     </div>
                   </RadioGroup>
@@ -327,7 +349,12 @@ export function CheckoutForm() {
                       <div className="flex-grow">
                         <p className="font-medium text-gray-800 line-clamp-1">{item.name}</p>
                         <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
-                        <p className="font-medium">${(parseFloat(item.price.toString()) * item.quantity).toFixed(2)}</p>
+                        <p className="font-medium">
+                          {getInrFromUsd(parseFloat(item.price.toString()) * item.quantity).formatted}
+                          <span className="text-xs text-gray-500 ml-1">
+                            ({formatUsd(parseFloat(item.price.toString()) * item.quantity)})
+                          </span>
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -336,20 +363,38 @@ export function CheckoutForm() {
                 <div className="space-y-2">
                   <div className="flex justify-between text-gray-600">
                     <span>Subtotal</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <div className="text-right">
+                      <span>{getInrFromUsd(subtotal).formatted}</span>
+                      <div className="text-xs text-gray-500">{formatUsd(subtotal)}</div>
+                    </div>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Shipping</span>
-                    <span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
+                    <div className="text-right">
+                      {shipping === 0 ? (
+                        <span>Free</span>
+                      ) : (
+                        <>
+                          <span>{getInrFromUsd(shipping).formatted}</span>
+                          <div className="text-xs text-gray-500">{formatUsd(shipping)}</div>
+                        </>
+                      )}
+                    </div>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Tax (8%)</span>
-                    <span>${tax.toFixed(2)}</span>
+                    <div className="text-right">
+                      <span>{getInrFromUsd(tax).formatted}</span>
+                      <div className="text-xs text-gray-500">{formatUsd(tax)}</div>
+                    </div>
                   </div>
                   <Separator />
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
-                    <span>${total.toFixed(2)}</span>
+                    <div className="text-right">
+                      <span>{getInrFromUsd(total).formatted}</span>
+                      <div className="text-xs text-gray-500">{formatUsd(total)}</div>
+                    </div>
                   </div>
                 </div>
               </CardContent>

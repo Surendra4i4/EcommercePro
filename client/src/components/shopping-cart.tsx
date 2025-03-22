@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/sheet";
 import { Plus, Minus, ShoppingCart, X, Trash2 } from "lucide-react";
 import { CartItem } from "@/hooks/use-cart";
+import { getInrFromUsd, formatUsd } from "@/lib/currency";
 
 interface ShoppingCartProps {
   children: React.ReactNode;
@@ -64,18 +65,31 @@ export function ShoppingCartDrawer({ children }: ShoppingCartProps) {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium">${cartTotal().toFixed(2)}</span>
+                  <div className="text-right">
+                    <span className="font-medium">{getInrFromUsd(cartTotal()).formatted}</span>
+                    <div className="text-xs text-gray-500">{formatUsd(cartTotal())}</div>
+                  </div>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Shipping</span>
-                  <span className="font-medium">
-                    {cartTotal() > 100 ? "Free" : "$10.00"}
-                  </span>
+                  <div className="text-right">
+                    {cartTotal() > 100 ? (
+                      <span className="font-medium">Free</span>
+                    ) : (
+                      <>
+                        <span className="font-medium">{getInrFromUsd(10).formatted}</span>
+                        <div className="text-xs text-gray-500">$10.00</div>
+                      </>
+                    )}
+                  </div>
                 </div>
                 <Separator />
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>${(cartTotal() + (cartTotal() > 100 ? 0 : 10)).toFixed(2)}</span>
+                  <div className="text-right">
+                    <span>{getInrFromUsd(cartTotal() + (cartTotal() > 100 ? 0 : 10)).formatted}</span>
+                    <div className="text-xs text-gray-500">{formatUsd(cartTotal() + (cartTotal() > 100 ? 0 : 10))}</div>
+                  </div>
                 </div>
               </div>
 
@@ -153,9 +167,12 @@ function CartItemCard({ item, updateQuantity, removeItem }: CartItemCardProps) {
             </button>
           </div>
           
-          <p className="font-bold text-gray-800">
-            ${totalPrice.toFixed(2)}
-          </p>
+          <div className="text-right">
+            <p className="font-bold text-gray-800">
+              {getInrFromUsd(totalPrice).formatted}
+            </p>
+            <p className="text-xs text-gray-500">{formatUsd(totalPrice)}</p>
+          </div>
         </div>
       </div>
     </div>
